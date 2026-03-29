@@ -14,7 +14,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     isAttacking: boolean = false
 	attackHitbox: any
     mainScene: any
-    private isTakingHit: boolean = false
     private attackEnableTimer?: Phaser.Time.TimerEvent
 
     static preload(scene: Phaser.Scene) {
@@ -75,6 +74,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         // this.setGravityY(5000)
         this.setDamping(true)
         this.setDrag(0.01)
+		// this.setDepth(100)
 
         this.body?.setSize(84, 70)
         this.on('animationcomplete-attack', () => {
@@ -94,7 +94,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             J: Phaser.Input.Keyboard.KeyCodes.J
         })
 		this.attackHitbox = scene.physics.add.sprite(this.x, this.y, "")
-		this.attackHitbox.body.setSize(40, 110)
+		this.attackHitbox.body.setSize(200, 120)
+		// if (this.flipX)
+		// 	this.attackHitbox.setPosition(this.x - 120, this.y + 160)
+		// else
+		// 	this.attackHitbox.setPosition(this.x + 20, this.y + 60)
+
 		this.attackHitbox.setVisible(false)
 		this.attackHitbox.body.enable = false
 		this.attackHitbox.body.setAllowGravity(false)
@@ -103,6 +108,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     update() {
         this.angle = this.flipX ? -45 : 45
+		
+		this.attackHitbox.setPosition(this.x, this.y + 40)
 
         const isAnimAttack = this.anims.currentAnim?.key === 'attack' && this.anims.isPlaying
         if (!this.isAttacking)
