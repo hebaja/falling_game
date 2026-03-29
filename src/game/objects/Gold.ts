@@ -27,8 +27,8 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this)
         scene.physics.add.existing(this)
 
-        this.setCollideWorldBounds(true)
-        this.setGravityY(5000)
+        // this.setCollideWorldBounds(true)
+        this.setGravityY(-500)
         
         this.body?.setSize(55, 35)
         
@@ -41,5 +41,15 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
         });
 
     }
+
+	update()
+	{
+
+	}
+
+	destroy()
+	{
+		this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)    
+	}
 
 }
