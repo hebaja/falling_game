@@ -123,9 +123,28 @@ export class Game extends Scene
 
 	destroyGold(_player: any, _gold: any)
     {
-		console.log('destroying gold')
-		_gold.disableBody(true, true)
-		_gold.destroy()
-		_gold = null
+		if (!_gold || !_gold.active) return
+		if (_gold.getData?.('destroying')) return
+		_gold.setData?.('destroying', true)
+
+		// Keep the body enabled until the explosion finishes, but freeze movement.
+		_gold.play('gold_explosion', true)
+		
+		if (_gold.body) {
+			_gold.body.setVelocity(0, 0)
+			_gold.body.setAcceleration(0, 0)
+			_gold.body.setAllowGravity(false)
+		}
+
+		const finish = () => {
+			if (!_gold || !_gold.active) return
+			_gold.disableBody(true, true)
+			_gold.destroy()
+		}
+
+		_gold.once('animationcomplete', finish)
+
+		// Fallback: if the explosion animation is replaced, still clean up.
+		_gold.once('animationcomplete', finish)
     }
 }

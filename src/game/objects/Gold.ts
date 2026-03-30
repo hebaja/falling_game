@@ -2,10 +2,16 @@ import { getRandomMovement, getRandomX } from "../utils/random"
 
 export class Gold extends Phaser.Physics.Arcade.Sprite {
 
+	private shineTimer?: Phaser.Time.TimerEvent
+
     static preload(scene: Phaser.Scene) {
         scene.load.spritesheet('gold', 'Gold Stone 3_Highlight.png', {
            frameHeight: 128,
            frameWidth: 128
+        })
+        scene.load.spritesheet('explosion', 'Explosion_02.png', {
+           frameHeight: 192,
+           frameWidth: 192
         })
     }
 
@@ -16,13 +22,14 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
             frameRate: 8,
             repeat: 2
         })
+        scene.anims.create({
+            key: 'gold_explosion',
+            frames: scene.anims.generateFrameNumbers('explosion', {frames: [0, 1, 2, 3, 4, 5, 6, 7]}),
+            frameRate: 8,
+            repeat: 0
+        })
     }
     
-    static collect(player: any, gold: any)
-    {
-        gold.disableBody(true, true)
-    }
-
     constructor(scene: Phaser.Scene) {
         super(scene, getRandomX(), 1044, 'gold')
 
@@ -33,11 +40,13 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
         
         this.body?.setSize(55, 35)
         
-        scene.time.addEvent({
+		this.shineTimer = scene.time.addEvent({
             delay: 500,
             loop: true,
             callback: () => {
-                this.play('gold_shine');
+				// Don't interrupt the explosion animation.
+				if (!this.active || this.anims.currentAnim?.key === 'gold_explosion') return
+				this.play('gold_shine');
             }
         });
 
@@ -48,9 +57,12 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
 
 	}
 
-	destroy()
+	destroy(fromScene?: boolean)
 	{
-		this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)    
+		this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)
+		this.shineTimer?.remove(false)
+		this.shineTimer = undefined
+		super.destroy(fromScene)
 	}
 
 }

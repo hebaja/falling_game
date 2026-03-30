@@ -5,7 +5,7 @@ export function getRandomX() {
 }
 
 export function getRandomMovement() {
-	return Phaser.Math.Between(-200, -1500) * MOVEMENT
+	return Phaser.Math.Between(-100, -500) * MOVEMENT
 }
 
 export function getMovement() {

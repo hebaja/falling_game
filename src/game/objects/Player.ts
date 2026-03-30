@@ -80,9 +80,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.on('animationcomplete-attack', () => {
             this.isAttacking = false
         })
-        this.on('animationstop-attack', () => {
-            this.isAttacking = false
-        })
+        // this.on('animationstop-attack', () => {
+        //     this.isAttacking = false
+        // })
 
         this.controls = this.keyboard?.addKeys({
             left: Phaser.Input.Keyboard.KeyCodes.LEFT,
