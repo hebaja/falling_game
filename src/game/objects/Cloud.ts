@@ -1,5 +1,4 @@
-import { getRandomX } from "../utils/random"
-import { MOVEMENT } from "./constants"
+import { getMovement, getRandomX } from "../utils/random"
 
 export class Cloud extends Phaser.Physics.Arcade.Sprite {
 
@@ -20,7 +19,7 @@ export class Cloud extends Phaser.Physics.Arcade.Sprite {
 	// }
 
 	static getRandomMovement() {
-		return Phaser.Math.Between(-200, -1500) * MOVEMENT
+		return Phaser.Math.Between(-200, -1500) * getMovement()
 	}
 
     constructor(scene: Phaser.Scene) {

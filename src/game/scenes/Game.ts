@@ -2,13 +2,12 @@ import { Scene } from 'phaser';
 import { Player } from '../objects/Player';
 import { Gold } from '../objects/Gold';
 import { Cloud } from '../objects/Cloud';
-import { getRandomX } from '../utils/random';
-import { MOVEMENT } from '../objects/constants';
+import { getMovement, getRandomX } from '../utils/random';
 
 export class Game extends Scene
 {
     player: Player
-    // golds: Gold[] = []
+    golds: Gold[] = []
 	clouds: Cloud[] = []
 	gold: any
 	private spawnTimer?: Phaser.Time.TimerEvent
@@ -38,7 +37,7 @@ export class Game extends Scene
         this.add.image(1024 / 2, 1024 / 2, 'background')
 
         Player.createAnims(this)
-        // Gold.createAnims(this)
+        Gold.createAnims(this)
 
         this.player = new Player(this, 1024 / 2, 1024 / 2, 'player_idle')
 		// const cloud = new Cloud(this);
@@ -55,6 +54,7 @@ export class Game extends Scene
         // this.cameras.main.setBounds(0, 0, 3072, 1024)
 		this.scheduleNextCloud()
 		this.scheduleNextStreak()
+		this.scheduleNextGold()
 		this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
 			this.spawnTimer?.remove(false)
 			this.spawnTimer = undefined
@@ -66,7 +66,7 @@ export class Game extends Scene
 			const lineStreak = this.physics.add.image(getRandomX(), 1104, "")
 				.setDisplaySize(1, 150)
 				.setTint(0xffffff)
-			lineStreak.setGravityY(-400 * MOVEMENT)
+			lineStreak.setGravityY(-400 * getMovement())
 			this.scheduleNextStreak()
 		})
 	}
@@ -75,6 +75,15 @@ export class Game extends Scene
 		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
 			this.clouds.push(new Cloud(this))
 			this.scheduleNextCloud()
+		})
+	}
+	
+	private scheduleNextGold() {
+		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
+			const gold = new Gold(this)
+			this.physics.add.overlap(this.player.attackHitbox, gold, this.destroyGold, undefined, this)
+			this.golds.push(gold)
+			this.scheduleNextGold()
 		})
 	}
 
@@ -97,12 +106,18 @@ export class Game extends Scene
 				this.clouds.splice(i, 1)
 			}
 		}
-
-		if (this.gold && this.gold.y < -100) {
-			console.log('destroying gold')
-			this.gold.disableBody(true, true)
-			this.gold.destroy()
-			this.gold = null
+		
+		for (let i = this.golds.length - 1; i >= 0; i--) {
+			const gold = this.golds[i]
+			if (!gold.active) {
+				this.golds.splice(i, 1)
+				continue
+			}
+			const b = gold.getBounds()
+			if (b.bottom < 0) {
+				gold.destroy()
+				this.golds.splice(i, 1)
+			}
 		}
     }
 

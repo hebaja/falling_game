@@ -1,3 +1,5 @@
+import { getRandomMovement, getRandomX } from "../utils/random"
+
 export class Gold extends Phaser.Physics.Arcade.Sprite {
 
     static preload(scene: Phaser.Scene) {
@@ -21,19 +23,18 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
         gold.disableBody(true, true)
     }
 
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
-        super(scene, x, y, texture)
+    constructor(scene: Phaser.Scene) {
+        super(scene, getRandomX(), 1044, 'gold')
 
         scene.add.existing(this)
         scene.physics.add.existing(this)
 
-        // this.setCollideWorldBounds(true)
-        this.setGravityY(-500)
+        this.setGravityY(getRandomMovement())
         
         this.body?.setSize(55, 35)
         
         scene.time.addEvent({
-            delay: 4000,
+            delay: 500,
             loop: true,
             callback: () => {
                 this.play('gold_shine');
