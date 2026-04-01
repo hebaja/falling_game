@@ -15,6 +15,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 	attackHitbox: any
     mainScene: any
     private attackEnableTimer?: Phaser.Time.TimerEvent
+	private isFalling: boolean = true
 
     static preload(scene: Phaser.Scene) {
         scene.load.spritesheet('player_idle', 'Warrior_Idle.png', {
@@ -62,8 +63,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         })
     }
 
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
-        super(scene, x, y, texture)
+	constructor(scene: Phaser.Scene,) {
+        super(scene, 512, 512, 'player_idle')
         this.mainScene = scene
         this.keyboard = scene.input.keyboard
         if (!this.keyboard) throw new Error('Keyboard plugin not available')
@@ -80,9 +81,6 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.on('animationcomplete-attack', () => {
             this.isAttacking = false
         })
-        // this.on('animationstop-attack', () => {
-        //     this.isAttacking = false
-        // })
 
         this.controls = this.keyboard?.addKeys({
             left: Phaser.Input.Keyboard.KeyCodes.LEFT,
@@ -95,20 +93,34 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         })
 		this.attackHitbox = scene.physics.add.sprite(this.x, this.y, "")
 		this.attackHitbox.body.setSize(200, 120)
-		// if (this.flipX)
-		// 	this.attackHitbox.setPosition(this.x - 120, this.y + 160)
-		// else
-		// 	this.attackHitbox.setPosition(this.x + 20, this.y + 60)
 
 		this.attackHitbox.setVisible(false)
 		this.attackHitbox.body.enable = false
 		this.attackHitbox.body.setAllowGravity(false)
-        this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this)
-    }
+		this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this)
+	}
+
+	destroy(fromScene?: boolean)
+	{
+		this.scene?.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)
+		this.attackEnableTimer?.remove(false)
+		this.attackEnableTimer = undefined
+		this.attackHitbox?.destroy()
+		super.destroy(fromScene)
+	}
+
+	private vibration() {
+		if (this.isFalling) this.y++
+		else this.y--
+		if (this.y == 500) this.isFalling = true
+		if (this.y == 530) this.isFalling = false
+	}
 
     update() {
         this.angle = this.flipX ? -45 : 45
-		
+
+		this.vibration()
+
 		this.attackHitbox.setPosition(this.x, this.y + 40)
 
         const isAnimAttack = this.anims.currentAnim?.key === 'attack' && this.anims.isPlaying

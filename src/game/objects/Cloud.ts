@@ -27,21 +27,7 @@ export class Cloud extends Phaser.Physics.Arcade.Sprite {
 
         scene.add.existing(this)
         scene.physics.add.existing(this)
-
-        // this.setCollideWorldBounds(true)
         this.setGravityY(Cloud.getRandomMovement())
-		// this.setDepth(80)
-        
-        // this.body?.setSize(55, 35)
-        
-        // scene.time.addEvent({
-        //     delay: 4000,
-        //     loop: true,
-        //     callback: () => {
-        //         this.play('gold_shine');
-        //     }
-        // });
-
     }
 
 	update()
@@ -49,9 +35,10 @@ export class Cloud extends Phaser.Physics.Arcade.Sprite {
 
 	}
 
-	destroy()
+	destroy(fromScene?: boolean)
 	{
-		this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)    
+		// Cloud doesn't register scene-level update listeners.
+		super.destroy(fromScene)
 	}
 
 }

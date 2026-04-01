@@ -2,15 +2,20 @@ import { Scene } from 'phaser';
 import { Player } from '../objects/Player';
 import { Gold } from '../objects/Gold';
 import { Cloud } from '../objects/Cloud';
-import { getMovement, getRandomX } from '../utils/random';
+import { flipMovement, getMovement, getRandomX } from '../utils/random';
+import { GameOverOverlay } from '../scenes/GameOverOverlay'
 
 export class Game extends Scene
 {
     player: Player
     golds: Gold[] = []
 	clouds: Cloud[] = []
+	lines:  Phaser.Physics.Arcade.Image[] = []
 	gold: any
 	private spawnTimer?: Phaser.Time.TimerEvent
+	private countdownText?: Phaser.GameObjects.Text
+	private countdownEndsAt = 0
+	private remainingMs: number
 
     constructor ()
     {
@@ -29,32 +34,26 @@ export class Game extends Scene
 
     create ()
     {
-        // this.physics.world.gravity.y = 75
-        // this.physics.world.setBounds(0, 0, 3072, 1024)
-        // for (let x = 0; x < 3; x++) {
-            // this.add.image(512 * (x + (x + 1)) , 1024 / 2, 'background')
-        // }
         this.add.image(1024 / 2, 1024 / 2, 'background')
 
         Player.createAnims(this)
         Gold.createAnims(this)
 
-        this.player = new Player(this, 1024 / 2, 1024 / 2, 'player_idle')
-		// const cloud = new Cloud(this);
-
-		// this.gold = new Gold(this, 412, 1044, 'gold')
+        this.player = new Player(this)
 
 		this.physics.add.overlap(this.player.attackHitbox, this.gold, this.destroyGold, undefined, this)
 
-        // this.golds.push(new Gold(this, 512, 900, 'gold'))
-        // this.golds.push(new Gold(this, 712, 900, 'gold'))
-        // this.golds[0].body?.setSize(55, 35)
-
-        // this.cameras.main.startFollow(this.player, true)
-        // this.cameras.main.setBounds(0, 0, 3072, 1024)
 		this.scheduleNextCloud()
 		this.scheduleNextStreak()
 		this.scheduleNextGold()
+
+		this.countdownText = this.add.text(16, 16, '10', {
+			fontFamily: 'Arial',
+			fontSize: '64px',
+			color: '#000000',
+		}).setDepth(1000).setScrollFactor(0)
+		this.countdownEndsAt = this.time.now + 10_000
+		
 		this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
 			this.spawnTimer?.remove(false)
 			this.spawnTimer = undefined
@@ -67,6 +66,7 @@ export class Game extends Scene
 				.setDisplaySize(1, 150)
 				.setTint(0xffffff)
 			lineStreak.setGravityY(-400 * getMovement())
+			this.lines.push(lineStreak)
 			this.scheduleNextStreak()
 		})
 	}
@@ -93,6 +93,12 @@ export class Game extends Scene
 
     update ()
     {
+		if (this.countdownText) {
+			this.remainingMs = Math.max(0, this.countdownEndsAt - this.time.now)
+			this.countdownText.setText(String(Math.ceil(this.remainingMs / 1000)))
+			// TODO: handle remainingMs === 0 (time up)
+		}
+
 		// Cleanup clouds once they are fully off-screen (above the top edge).
 		for (let i = this.clouds.length - 1; i >= 0; i--) {
 			const cloud = this.clouds[i]
@@ -119,6 +125,23 @@ export class Game extends Scene
 				this.golds.splice(i, 1)
 			}
 		}
+		
+		for (let i = this.lines.length - 1; i >= 0; i--) {
+			const line = this.lines[i]
+			if (!line.active) {
+				this.lines.splice(i, 1)
+				continue
+			}
+			const l = line.getBounds()
+			if (l.bottom < 0) {
+				line.destroy()
+				this.lines.splice(i, 1)
+			}
+		}
+		if (this.remainingMs == 0) {
+			this.scene.pause()
+			this.scene.launch("GameOverOverlay")
+		}
     }
 
 	destroyGold(_player: any, _gold: any)
@@ -136,15 +159,55 @@ export class Game extends Scene
 			_gold.body.setAllowGravity(false)
 		}
 
+		for (const gold of this.golds) {
+			const y = gold.body?.gravity.y
+			if (y !== undefined) {
+				gold.setGravityY(-y)
+				this.time.delayedCall(1000, () => {
+					if (!gold.active) return
+					gold.setGravityY(y) // restore original
+				})
+			}
+		}
+
+		for (const cloud of this.clouds) {
+			const y = cloud.body?.gravity.y
+			if (y !== undefined) {
+				cloud.setGravityY(-y)
+				this.time.delayedCall(1000, () => {
+					if (!cloud.active) return
+					cloud.setGravityY(y) // restore original
+				})
+			}
+		}
+		
+		for (const line of this.lines) {
+			const y = line.body?.gravity.y
+			if (y !== undefined) {
+				line.setGravityY(-y)
+				this.time.delayedCall(1000, () => {
+					if (!line.active) return
+					line.setGravityY(y) // restore original
+				})
+			}
+		}
+		
+		flipMovement()
+		this.time.delayedCall(1000, () => {
+			flipMovement()
+		})
+
 		const finish = () => {
 			if (!_gold || !_gold.active) return
 			_gold.disableBody(true, true)
 			_gold.destroy()
+			// Add 2 seconds per destroyed gold.
 		}
+		this.countdownEndsAt += 4_000
 
-		_gold.once('animationcomplete', finish)
+		_gold.once('animationcomplete-gold_explosion', finish)
 
 		// Fallback: if the explosion animation is replaced, still clean up.
-		_gold.once('animationcomplete', finish)
+		// _gold.once('animationcomplete', finish)
     }
 }

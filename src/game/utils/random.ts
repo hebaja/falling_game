@@ -11,3 +11,7 @@ export function getRandomMovement() {
 export function getMovement() {
 	return MOVEMENT
 }
+
+export function flipMovement() {
+	MOVEMENT *= -1
+}

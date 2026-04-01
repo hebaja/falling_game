@@ -59,7 +59,6 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
 
 	destroy(fromScene?: boolean)
 	{
-		this.scene.events.off(Phaser.Scenes.Events.UPDATE, this.update, this)
 		this.shineTimer?.remove(false)
 		this.shineTimer = undefined
 		super.destroy(fromScene)
