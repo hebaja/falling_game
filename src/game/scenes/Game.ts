@@ -9,8 +9,8 @@ export class Game extends Scene
 {
     player: Player
     golds: Gold[] = []
-	clouds: Cloud[] = []
-	lines:  Phaser.Physics.Arcade.Image[] = []
+	// clouds: Cloud[] = []
+	// lines:  Phaser.Physics.Arcade.Image[] = []
 	gold: any
 	private spawnTimer?: Phaser.Time.TimerEvent
 	private countdownText?: Phaser.GameObjects.Text
@@ -25,16 +25,52 @@ export class Game extends Scene
     preload ()
     {
         this.load.setPath('src/game/assets');
-        this.load.image('background', 'default_background.png');
+        // this.load.image('background', 'default_background.png');
+
+		this.load.tilemapTiledJSON('level', 'tiny/tilemap.json')
+
+		this.load.image('cloud_1', 'tiny/Terrain/Decorations/Clouds/Clouds_01.png')
+		this.load.image('cloud_2', 'tiny/Terrain/Decorations/Clouds/Clouds_02.png')
+		this.load.image('cloud_3', 'tiny/Terrain/Decorations/Clouds/Clouds_03.png')
+		this.load.image('cloud_4', 'tiny/Terrain/Decorations/Clouds/Clouds_04.png')
+		this.load.image('cloud_5', 'tiny/Terrain/Decorations/Clouds/Clouds_05.png')
+		this.load.image('cloud_6', 'tiny/Terrain/Decorations/Clouds/Clouds_06.png')
+		this.load.image('cloud_7', 'tiny/Terrain/Decorations/Clouds/Clouds_07.png')
+		this.load.image('cloud_8', 'tiny/Terrain/Decorations/Clouds/Clouds_08.png')
 
         Player.preload(this)
         Gold.preload(this)
-		Cloud.preload(this)
+		// Cloud.preload(this)
     }
 
     create ()
     {
-        this.add.image(1024 / 2, 1024 / 2, 'background')
+        // this.add.image(1024 / 2, 1024 / 2, 'background')
+		const map = this.make.tilemap({ key: 'level' })
+
+		console.log(map)
+
+		const cloudsLayer = map.getObjectLayer('background01')
+		if (cloudsLayer) {
+			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
+			const firstGid = cloudsTileset?.firstgid ?? 1
+			for (const obj of cloudsLayer.objects) {
+				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
+				const tileIndex = obj.gid - firstGid // 0..7
+				if (tileIndex < 0 || tileIndex > 7) continue
+				this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
+					.setOrigin(0, 1)
+					.setDepth(50)
+			}
+			// const CLOUDS_FIRST_GID = 56
+			// for (const obj of cloudsLayer.objects) {
+			// 		if (!('gid' in obj) || typeof obj.gid !== 'number') continue
+			// 		const tileIndex = obj.gid - CLOUDS_FIRST_GID; // 0..7
+			// 		const textureKey = `cloud_${tileIndex + 1}`
+
+			// 		this.add.image(obj.x ?? 0, obj.y ?? 0, textureKey).setOrigin(0, 1).setDepth(50)
+			// }
+		}
 
         Player.createAnims(this)
         Gold.createAnims(this)
@@ -43,8 +79,8 @@ export class Game extends Scene
 
 		this.physics.add.overlap(this.player.attackHitbox, this.gold, this.destroyGold, undefined, this)
 
-		this.scheduleNextCloud()
-		this.scheduleNextStreak()
+		// this.scheduleNextCloud()
+		// this.scheduleNextStreak()
 		this.scheduleNextGold()
 
 		this.countdownText = this.add.text(16, 16, '10', {
@@ -60,23 +96,23 @@ export class Game extends Scene
 		})
     }
 
-	private scheduleNextStreak() {
-		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
-			const lineStreak = this.physics.add.image(getRandomX(), 1104, "")
-				.setDisplaySize(1, 150)
-				.setTint(0xffffff)
-			lineStreak.setGravityY(-400 * getMovement())
-			this.lines.push(lineStreak)
-			this.scheduleNextStreak()
-		})
-	}
+	// private scheduleNextStreak() {
+	// 	this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
+	// 		const lineStreak = this.physics.add.image(getRandomX(), 1104, "")
+	// 			.setDisplaySize(1, 150)
+	// 			.setTint(0xffffff)
+	// 		lineStreak.setGravityY(-400 * getMovement())
+	// 		this.lines.push(lineStreak)
+	// 		this.scheduleNextStreak()
+	// 	})
+	// }
 
-	private scheduleNextCloud() {
-		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
-			this.clouds.push(new Cloud(this))
-			this.scheduleNextCloud()
-		})
-	}
+	// private scheduleNextCloud() {
+	// 	this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
+	// 		this.clouds.push(new Cloud(this))
+	// 		this.scheduleNextCloud()
+	// 	})
+	// }
 	
 	private scheduleNextGold() {
 		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
@@ -100,18 +136,18 @@ export class Game extends Scene
 		}
 
 		// Cleanup clouds once they are fully off-screen (above the top edge).
-		for (let i = this.clouds.length - 1; i >= 0; i--) {
-			const cloud = this.clouds[i]
-			if (!cloud.active) {
-				this.clouds.splice(i, 1)
-				continue
-			}
-			const b = cloud.getBounds()
-			if (b.bottom < 0) {
-				cloud.destroy()
-				this.clouds.splice(i, 1)
-			}
-		}
+		// for (let i = this.clouds.length - 1; i >= 0; i--) {
+		// 	const cloud = this.clouds[i]
+		// 	if (!cloud.active) {
+		// 		this.clouds.splice(i, 1)
+		// 		continue
+		// 	}
+		// 	const b = cloud.getBounds()
+		// 	if (b.bottom < 0) {
+		// 		cloud.destroy()
+		// 		this.clouds.splice(i, 1)
+		// 	}
+		// }
 		
 		for (let i = this.golds.length - 1; i >= 0; i--) {
 			const gold = this.golds[i]
@@ -126,18 +162,18 @@ export class Game extends Scene
 			}
 		}
 		
-		for (let i = this.lines.length - 1; i >= 0; i--) {
-			const line = this.lines[i]
-			if (!line.active) {
-				this.lines.splice(i, 1)
-				continue
-			}
-			const l = line.getBounds()
-			if (l.bottom < 0) {
-				line.destroy()
-				this.lines.splice(i, 1)
-			}
-		}
+		// for (let i = this.lines.length - 1; i >= 0; i--) {
+		// 	const line = this.lines[i]
+		// 	if (!line.active) {
+		// 		this.lines.splice(i, 1)
+		// 		continue
+		// 	}
+		// 	const l = line.getBounds()
+		// 	if (l.bottom < 0) {
+		// 		line.destroy()
+		// 		this.lines.splice(i, 1)
+		// 	}
+		// }
 		if (this.remainingMs == 0) {
 			this.scene.pause()
 			this.scene.launch("GameOverOverlay")
@@ -170,27 +206,27 @@ export class Game extends Scene
 			}
 		}
 
-		for (const cloud of this.clouds) {
-			const y = cloud.body?.gravity.y
-			if (y !== undefined) {
-				cloud.setGravityY(-y)
-				this.time.delayedCall(1000, () => {
-					if (!cloud.active) return
-					cloud.setGravityY(y) // restore original
-				})
-			}
-		}
+		// for (const cloud of this.clouds) {
+		// 	const y = cloud.body?.gravity.y
+		// 	if (y !== undefined) {
+		// 		cloud.setGravityY(-y)
+		// 		this.time.delayedCall(1000, () => {
+		// 			if (!cloud.active) return
+		// 			cloud.setGravityY(y) // restore original
+		// 		})
+		// 	}
+		// }
 		
-		for (const line of this.lines) {
-			const y = line.body?.gravity.y
-			if (y !== undefined) {
-				line.setGravityY(-y)
-				this.time.delayedCall(1000, () => {
-					if (!line.active) return
-					line.setGravityY(y) // restore original
-				})
-			}
-		}
+		// for (const line of this.lines) {
+		// 	const y = line.body?.gravity.y
+		// 	if (y !== undefined) {
+		// 		line.setGravityY(-y)
+		// 		this.time.delayedCall(1000, () => {
+		// 			if (!line.active) return
+		// 			line.setGravityY(y) // restore original
+		// 		})
+		// 	}
+		// }
 		
 		flipMovement()
 		this.time.delayedCall(1000, () => {

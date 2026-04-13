@@ -1,0 +1,65 @@
+{
+    "activeFile": "tilemap.json",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "Clouds.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "sky_tile.tsx": {
+            "scaleInDock": 1
+        },
+        "tilemap.json": {
+            "scale": 0.25,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 1418,
+                "y": 528
+            }
+        },
+        "tilemap.json#Clouds": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "tilemap.json#Tilemap_color1": {
+            "scaleInDock": 1
+        },
+        "tilemap.json#sky_tile": {
+            "scaleInDock": 1
+        },
+        "tilemap.tmx": {
+            "scale": 0.25079752604166666,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 149.5230060354338,
+                "y": 510.37186060094757
+            }
+        },
+        "tilemap.tmx#Clouds": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "tilemap.tmx#Tilemap_color1": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "tilemap.tmx#sky_tile": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "/home/focus/42/phaser_demo/src/game/assets/tiny",
+    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "json",
+    "openFiles": [
+        "tilemap.json"
+    ],
+    "project": "tiny.tiled-project",
+    "property.type": "bool",
+    "recentFiles": [
+        "tilemap.json",
+        "tilemap.tmx"
+    ]
+}

@@ -1,0 +1,57 @@
+{
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "#Clouds": {
+            "dynamicWrapping": false
+        },
+        "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx": {
+            "scale": 0.26873372395833334,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1534.9766822118588,
+                "y": 513.5194718672401
+            }
+        },
+        "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx#Clouds": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1
+        },
+        "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx#Tilemap_color1": {
+            "scaleInDock": 1
+        },
+        "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx#sky_tile": {
+            "scaleInDock": 1
+        },
+        "falling.map.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 531,
+                "y": 602
+            }
+        },
+        "falling.map.tmx#Clouds": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        }
+    },
+    "last.exportedFilePath": "/home/focus/42/falling_game/src/game/assets/tiny",
+    "last.imagePath": "/home/focus/42/falling_game/src/game/assets/tiny/Terrain/Decorations/Clouds",
+    "map.height": 16,
+    "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 64,
+    "map.tileWidth": 64,
+    "map.width": 16,
+    "openFiles": [
+    ],
+    "project": "falling.tiled-project",
+    "recentFiles": [
+        "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.type": 1
+}
