@@ -1,6 +1,7 @@
 {
     "activeFile": "",
     "expandedProjectPaths": [
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -36,6 +37,34 @@
         "falling.map.tmx#Clouds": {
             "dynamicWrapping": true,
             "scaleInDock": 1
+        },
+        "tilemap.json": {
+            "scale": 0.806201171875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 511.6588940706196,
+                "y": 512.2790866694932
+            }
+        },
+        "tilemap.json#Clouds": {
+            "scaleInDock": 1
+        },
+        "tilemap.tmx": {
+            "scale": 0.26873372395833334,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1534.9766822118588,
+                "y": 513.5194718672401
+            }
+        },
+        "tilemap.tmx#Clouds": {
+            "scaleInDock": 1
+        },
+        "tilemap.tmx#Tilemap_color1": {
+            "scaleInDock": 1
+        },
+        "tilemap.tmx#sky_tile": {
+            "scaleInDock": 1
         }
     },
     "last.exportedFilePath": "/home/focus/42/falling_game/src/game/assets/tiny",
@@ -50,6 +79,7 @@
     ],
     "project": "falling.tiled-project",
     "recentFiles": [
+        "tilemap.tmx",
         "/home/focus/42/phaser_demo/src/game/assets/tiny/tilemap.tmx"
     ],
     "tileset.embedInMap": true,

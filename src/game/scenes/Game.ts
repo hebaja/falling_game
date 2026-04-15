@@ -16,6 +16,10 @@ export class Game extends Scene
 	private countdownText?: Phaser.GameObjects.Text
 	private countdownEndsAt = 0
 	private remainingMs: number
+	
+	cloudsLayer0: any[] = []
+	cloudsLayer1: any[] = []
+	cloudsLayer2: any[] = []
 
     constructor ()
     {
@@ -43,13 +47,35 @@ export class Game extends Scene
 		// Cloud.preload(this)
     }
 
+	populateCloudsLayer(backgroundLabel: string, map: Phaser.Tilemaps.Tilemap) {
+		const cloudsLayer = map.getObjectLayer(backgroundLabel)
+		if (cloudsLayer) {
+			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
+			const firstGid = cloudsTileset?.firstgid ?? 1
+			for (const obj of cloudsLayer.objects) {
+				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
+				const tileIndex = obj.gid - firstGid // 0..7
+				if (tileIndex < 0 || tileIndex > 7) continue
+				const cloud = this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
+					.setOrigin(0, 1)
+					.setDepth(0)
+				const delay = Phaser.Math.Between(0, 10000)
+				this.time.delayedCall(delay, () => {
+					this.cloudsLayer0.push(cloud)
+				})
+			}
+		}
+
+	}
+
     create ()
     {
-        // this.add.image(1024 / 2, 1024 / 2, 'background')
 		const map = this.make.tilemap({ key: 'level' })
 
-		console.log(map)
+		this.populateCloudsLayer('background01', map)
 
+
+		/*
 		const cloudsLayer = map.getObjectLayer('background01')
 		if (cloudsLayer) {
 			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
@@ -58,19 +84,45 @@ export class Game extends Scene
 				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
 				const tileIndex = obj.gid - firstGid // 0..7
 				if (tileIndex < 0 || tileIndex > 7) continue
+				const cloud = this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
+					.setOrigin(0, 1)
+					.setDepth(0)
+				const delay = Phaser.Math.Between(0, 10000)
+				this.time.delayedCall(delay, () => {
+					this.cloudsLayer0.push(cloud)
+				})
+			}
+		}
+		*/
+
+		/*
+		const cloudsLayer1 = map.getObjectLayer('background02')
+		if (cloudsLayer1) {
+			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
+			const firstGid = cloudsTileset?.firstgid ?? 1
+			for (const obj of cloudsLayer1.objects) {
+				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
+				const tileIndex = obj.gid - firstGid // 0..7
+				if (tileIndex < 0 || tileIndex > 7) continue
 				this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
 					.setOrigin(0, 1)
-					.setDepth(50)
+					.setDepth(0)
 			}
-			// const CLOUDS_FIRST_GID = 56
-			// for (const obj of cloudsLayer.objects) {
-			// 		if (!('gid' in obj) || typeof obj.gid !== 'number') continue
-			// 		const tileIndex = obj.gid - CLOUDS_FIRST_GID; // 0..7
-			// 		const textureKey = `cloud_${tileIndex + 1}`
-
-			// 		this.add.image(obj.x ?? 0, obj.y ?? 0, textureKey).setOrigin(0, 1).setDepth(50)
-			// }
 		}
+		const cloudsLayer2 = map.getObjectLayer('background03')
+		if (cloudsLayer2) {
+			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
+			const firstGid = cloudsTileset?.firstgid ?? 1
+			for (const obj of cloudsLayer2.objects) {
+				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
+				const tileIndex = obj.gid - firstGid // 0..7
+				if (tileIndex < 0 || tileIndex > 7) continue
+				this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
+					.setOrigin(0, 1)
+					.setDepth(0)
+			}
+		}
+		*/
 
         Player.createAnims(this)
         Gold.createAnims(this)
@@ -127,8 +179,23 @@ export class Game extends Scene
 		return Phaser.Math.Between(500, 2000)
 	}
 
-    update ()
+    update (time: number, delta: number)
     {
+		const cam = this.cameras.main
+		const top = cam.scrollY
+		const bottom = cam.scrollY + cam.height
+
+		const CLOUD_SPEED = 100
+		for (const cloud of this.cloudsLayer0) {
+			cloud.y -= CLOUD_SPEED * (delta / 1000)
+			if (cloud.getBounds().bottom < top) {
+				cloud.y = 1521
+				cloud.x = Phaser.Math.Between(0, cam.width)
+			}
+		}
+
+
+
 		if (this.countdownText) {
 			this.remainingMs = Math.max(0, this.countdownEndsAt - this.time.now)
 			this.countdownText.setText(String(Math.ceil(this.remainingMs / 1000)))
