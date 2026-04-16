@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="20">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="16" height="16" tilewidth="64" tileheight="64" infinite="0" nextlayerid="5" nextobjectid="22">
  <editorsettings>
   <export target="tilemap.json" format="json"/>
  </editorsettings>
@@ -30,29 +30,20 @@
    <image source="Terrain/Decorations/Clouds/Clouds_08.png" width="576" height="256"/>
   </tile>
  </tileset>
- <objectgroup id="3" name="background02">
-  <object id="16" gid="5" x="44" y="934" width="576" height="256"/>
-  <object id="17" gid="5" x="426" y="326" width="576" height="256"/>
-  <object id="18" gid="1" x="500" y="694" width="576" height="256"/>
-  <object id="19" gid="1" x="20" y="464" width="576" height="256"/>
+ <objectgroup id="3" name="background03">
+  <object id="16" gid="5" x="-54.242" y="1249.41" width="576" height="256"/>
+  <object id="18" gid="1" x="453.464" y="1259.32" width="576" height="256"/>
  </objectgroup>
- <objectgroup id="4" name="background03">
-  <object id="10" gid="2" x="-20" y="320" width="576" height="256"/>
-  <object id="11" gid="2" x="538" y="650" width="576" height="256"/>
-  <object id="12" gid="2" x="194" y="994" width="576" height="256"/>
-  <object id="13" gid="7" x="-20" y="760" width="576" height="256"/>
-  <object id="14" gid="7" x="606" y="344" width="576" height="256"/>
-  <object id="15" gid="7" x="262" y="230" width="576" height="256"/>
+ <objectgroup id="4" name="background02" visible="0">
+  <object id="10" gid="2" x="-105.832" y="1208.27" width="576" height="256"/>
+  <object id="13" gid="7" x="153.661" y="1201.14" width="576" height="256"/>
+  <object id="20" gid="7" x="658.152" y="1205.4" width="576" height="256"/>
+  <object id="21" gid="2" x="418.62" y="1209.39" width="576" height="256"/>
  </objectgroup>
- <objectgroup id="2" name="background01">
-  <object id="1" gid="8" x="-92" y="324" width="576" height="256"/>
-  <object id="2" gid="4" x="98" y="700" width="576" height="256"/>
-  <object id="3" gid="3" x="586" y="260" width="576" height="256"/>
-  <object id="4" gid="4" x="236" y="208" width="576" height="256"/>
-  <object id="5" gid="8" x="622" y="770" width="576" height="256"/>
-  <object id="6" gid="8" x="414" y="514" width="576" height="256"/>
-  <object id="7" gid="3" x="-62" y="992" width="576" height="256"/>
-  <object id="8" gid="8" x="400" y="962" width="576" height="256"/>
+ <objectgroup id="2" name="background01" visible="0">
+  <object id="2" gid="4" x="-172.596" y="1215.34" width="576" height="256"/>
+  <object id="6" gid="8" x="629.443" y="1213.76" width="576" height="256"/>
+  <object id="7" gid="3" x="258.579" y="1204" width="576" height="256"/>
  </objectgroup>
  <layer id="1" name="background00" width="16" height="16">
   <data encoding="csv">

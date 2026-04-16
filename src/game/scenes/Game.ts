@@ -1,9 +1,7 @@
 import { Scene } from 'phaser';
 import { Player } from '../objects/Player';
 import { Gold } from '../objects/Gold';
-import { Cloud } from '../objects/Cloud';
-import { flipMovement, getMovement, getRandomX } from '../utils/random';
-import { GameOverOverlay } from '../scenes/GameOverOverlay'
+import { getCloudMovement, speedMultiplier } from '../utils/random'
 
 export class Game extends Scene
 {
@@ -47,124 +45,49 @@ export class Game extends Scene
 		// Cloud.preload(this)
     }
 
-	populateCloudsLayer(backgroundLabel: string, map: Phaser.Tilemaps.Tilemap) {
-		const cloudsLayer = map.getObjectLayer(backgroundLabel)
-		if (cloudsLayer) {
+	populateCloudsLayer(backgroundLabel: string, map: Phaser.Tilemaps.Tilemap, cloudsLayer: any, depth: number) {
+		const layer = map.getObjectLayer(backgroundLabel)
+		if (layer) {
 			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
 			const firstGid = cloudsTileset?.firstgid ?? 1
-			for (const obj of cloudsLayer.objects) {
+			for (const obj of layer.objects) {
 				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
 				const tileIndex = obj.gid - firstGid // 0..7
 				if (tileIndex < 0 || tileIndex > 7) continue
 				const cloud = this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
 					.setOrigin(0, 1)
-					.setDepth(0)
+					.setDepth(depth)
 				const delay = Phaser.Math.Between(0, 10000)
 				this.time.delayedCall(delay, () => {
-					this.cloudsLayer0.push(cloud)
+					cloudsLayer.push(cloud)
 				})
 			}
 		}
-
 	}
 
     create ()
     {
 		const map = this.make.tilemap({ key: 'level' })
 
-		this.populateCloudsLayer('background01', map)
-
-
-		/*
-		const cloudsLayer = map.getObjectLayer('background01')
-		if (cloudsLayer) {
-			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
-			const firstGid = cloudsTileset?.firstgid ?? 1
-			for (const obj of cloudsLayer.objects) {
-				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
-				const tileIndex = obj.gid - firstGid // 0..7
-				if (tileIndex < 0 || tileIndex > 7) continue
-				const cloud = this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
-					.setOrigin(0, 1)
-					.setDepth(0)
-				const delay = Phaser.Math.Between(0, 10000)
-				this.time.delayedCall(delay, () => {
-					this.cloudsLayer0.push(cloud)
-				})
-			}
-		}
-		*/
-
-		/*
-		const cloudsLayer1 = map.getObjectLayer('background02')
-		if (cloudsLayer1) {
-			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
-			const firstGid = cloudsTileset?.firstgid ?? 1
-			for (const obj of cloudsLayer1.objects) {
-				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
-				const tileIndex = obj.gid - firstGid // 0..7
-				if (tileIndex < 0 || tileIndex > 7) continue
-				this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
-					.setOrigin(0, 1)
-					.setDepth(0)
-			}
-		}
-		const cloudsLayer2 = map.getObjectLayer('background03')
-		if (cloudsLayer2) {
-			const cloudsTileset = map.tilesets.find(ts => ts.name === 'Clouds')
-			const firstGid = cloudsTileset?.firstgid ?? 1
-			for (const obj of cloudsLayer2.objects) {
-				if (!('gid' in obj) || typeof obj.gid !== 'number') continue
-				const tileIndex = obj.gid - firstGid // 0..7
-				if (tileIndex < 0 || tileIndex > 7) continue
-				this.add.image(obj.x ?? 0, obj.y ?? 0, `cloud_${tileIndex + 1}`)
-					.setOrigin(0, 1)
-					.setDepth(0)
-			}
-		}
-		*/
-
+		this.populateCloudsLayer('background01', map, this.cloudsLayer0, 10)
+		this.populateCloudsLayer('background02', map, this.cloudsLayer1, 40)
+		this.populateCloudsLayer('background03', map, this.cloudsLayer2, 90)
         Player.createAnims(this)
         Gold.createAnims(this)
-
         this.player = new Player(this)
-
 		this.physics.add.overlap(this.player.attackHitbox, this.gold, this.destroyGold, undefined, this)
-
-		// this.scheduleNextCloud()
-		// this.scheduleNextStreak()
 		this.scheduleNextGold()
-
 		this.countdownText = this.add.text(16, 16, '10', {
 			fontFamily: 'Arial',
 			fontSize: '64px',
 			color: '#000000',
 		}).setDepth(1000).setScrollFactor(0)
 		this.countdownEndsAt = this.time.now + 10_000
-		
 		this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
 			this.spawnTimer?.remove(false)
 			this.spawnTimer = undefined
 		})
     }
-
-	// private scheduleNextStreak() {
-	// 	this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
-	// 		const lineStreak = this.physics.add.image(getRandomX(), 1104, "")
-	// 			.setDisplaySize(1, 150)
-	// 			.setTint(0xffffff)
-	// 		lineStreak.setGravityY(-400 * getMovement())
-	// 		this.lines.push(lineStreak)
-	// 		this.scheduleNextStreak()
-	// 	})
-	// }
-
-	// private scheduleNextCloud() {
-	// 	this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
-	// 		this.clouds.push(new Cloud(this))
-	// 		this.scheduleNextCloud()
-	// 	})
-	// }
 	
 	private scheduleNextGold() {
 		this.spawnTimer = this.time.delayedCall(this.getRandomDelay(), () => {
@@ -179,42 +102,29 @@ export class Game extends Scene
 		return Phaser.Math.Between(500, 2000)
 	}
 
-    update (time: number, delta: number)
-    {
+	manageCloudsLayer(cloudsLayer: any, cloudSpeed: number, delta: number) {
 		const cam = this.cameras.main
 		const top = cam.scrollY
-		const bottom = cam.scrollY + cam.height
 
-		const CLOUD_SPEED = 100
-		for (const cloud of this.cloudsLayer0) {
-			cloud.y -= CLOUD_SPEED * (delta / 1000)
+		for (const cloud of cloudsLayer) {
+			cloud.y -= (cloudSpeed * getCloudMovement())* (delta / 1000)
 			if (cloud.getBounds().bottom < top) {
 				cloud.y = 1521
 				cloud.x = Phaser.Math.Between(0, cam.width)
 			}
 		}
+	}
 
-
+    update (_time: number, delta: number)
+    {
+		this.manageCloudsLayer(this.cloudsLayer0, 100, delta)
+		this.manageCloudsLayer(this.cloudsLayer1, 500, delta)
+		this.manageCloudsLayer(this.cloudsLayer2, 1500, delta)
 
 		if (this.countdownText) {
 			this.remainingMs = Math.max(0, this.countdownEndsAt - this.time.now)
 			this.countdownText.setText(String(Math.ceil(this.remainingMs / 1000)))
-			// TODO: handle remainingMs === 0 (time up)
 		}
-
-		// Cleanup clouds once they are fully off-screen (above the top edge).
-		// for (let i = this.clouds.length - 1; i >= 0; i--) {
-		// 	const cloud = this.clouds[i]
-		// 	if (!cloud.active) {
-		// 		this.clouds.splice(i, 1)
-		// 		continue
-		// 	}
-		// 	const b = cloud.getBounds()
-		// 	if (b.bottom < 0) {
-		// 		cloud.destroy()
-		// 		this.clouds.splice(i, 1)
-		// 	}
-		// }
 		
 		for (let i = this.golds.length - 1; i >= 0; i--) {
 			const gold = this.golds[i]
@@ -229,18 +139,6 @@ export class Game extends Scene
 			}
 		}
 		
-		// for (let i = this.lines.length - 1; i >= 0; i--) {
-		// 	const line = this.lines[i]
-		// 	if (!line.active) {
-		// 		this.lines.splice(i, 1)
-		// 		continue
-		// 	}
-		// 	const l = line.getBounds()
-		// 	if (l.bottom < 0) {
-		// 		line.destroy()
-		// 		this.lines.splice(i, 1)
-		// 	}
-		// }
 		if (this.remainingMs == 0) {
 			this.scene.pause()
 			this.scene.launch("GameOverOverlay")
@@ -261,44 +159,70 @@ export class Game extends Scene
 			_gold.body.setAcceleration(0, 0)
 			_gold.body.setAllowGravity(false)
 		}
+		
+		this.tweens.killTweensOf(this.player)
+		this.player.isRising = true
+		this.tweens.add({
+			targets: this.player,
+			y: 350,
+			duration: 600,
+			yoyo: true,
+			ease: 'Sine.easeInOut',
+			onComplete: () => {
+				this.player.isRising = false
+			}
+		})
+
+		this.tweens.killTweensOf(speedMultiplier)
+		speedMultiplier.value = 1
+		this.tweens.add({
+			targets: speedMultiplier,
+			value: -1,
+			duration: 600,
+			yoyo: true,
+			ease: 'Sine.easeInOut',
+			onComplete: () => {
+				speedMultiplier.value = 1
+			}
+		})
 
 		for (const gold of this.golds) {
-			const y = gold.body?.gravity.y
-			if (y !== undefined) {
-				gold.setGravityY(-y)
-				this.time.delayedCall(1000, () => {
-					if (!gold.active) return
-					gold.setGravityY(y) // restore original
-				})
-			}
+			if (!gold.active || !gold.body) continue
+			const baseGravity = gold.getData?.('baseGravityY')
+			if (typeof baseGravity !== 'number') continue
+
+			this.tweens.killTweensOf(gold.body.gravity)
+			gold.body.gravity.y = baseGravity
+
+			this.tweens.add({
+				targets: gold.body.gravity,
+				y: -baseGravity,
+				duration: 600,
+				yoyo: true,
+				ease: 'Sine.easeInOut',
+				onComplete: () => {
+					if (gold.body) {
+						gold.body.gravity.y = baseGravity
+					}
+				}
+			})
 		}
 
-		// for (const cloud of this.clouds) {
-		// 	const y = cloud.body?.gravity.y
+		// for (const gold of this.golds) {
+		// 	const y = gold.body?.gravity.y
 		// 	if (y !== undefined) {
-		// 		cloud.setGravityY(-y)
+		// 		gold.setGravityY(-y)
 		// 		this.time.delayedCall(1000, () => {
-		// 			if (!cloud.active) return
-		// 			cloud.setGravityY(y) // restore original
+		// 			if (!gold.active) return
+		// 			gold.setGravityY(y) // restore original
 		// 		})
 		// 	}
 		// }
-		
-		// for (const line of this.lines) {
-		// 	const y = line.body?.gravity.y
-		// 	if (y !== undefined) {
-		// 		line.setGravityY(-y)
-		// 		this.time.delayedCall(1000, () => {
-		// 			if (!line.active) return
-		// 			line.setGravityY(y) // restore original
-		// 		})
-		// 	}
-		// }
-		
-		flipMovement()
-		this.time.delayedCall(1000, () => {
-			flipMovement()
-		})
+
+		// flipMovement()
+		// this.time.delayedCall(1000, () => {
+		// 	flipMovement()
+		// })
 
 		const finish = () => {
 			if (!_gold || !_gold.active) return
@@ -308,9 +232,23 @@ export class Game extends Scene
 		}
 		this.countdownEndsAt += 4_000
 
-		_gold.once('animationcomplete-gold_explosion', finish)
 
-		// Fallback: if the explosion animation is replaced, still clean up.
-		// _gold.once('animationcomplete', finish)
+		// console.log(this.player.isRising)
+
+		// this.tweens.add({
+		// 	targets: this.player,
+		// 	y: 350,
+		// 	duration: 500,
+		// 	yoyo: true,
+		// 	ease: 'Sine.easeInOut',
+		// 	onComplete: () => {
+		// 		this.player.isRising = false
+
+		// 	} 
+		// })
+		//
+		console.log(speedMultiplier)
+
+		_gold.once('animationcomplete-gold_explosion', finish)
     }
 }

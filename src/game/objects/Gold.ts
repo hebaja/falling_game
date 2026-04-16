@@ -36,9 +36,14 @@ export class Gold extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this)
         scene.physics.add.existing(this)
 
-        this.setGravityY(getRandomMovement())
+		const initialGravity = getRandomMovement()
+
+        this.setGravityY(initialGravity)
+
+		this.setData('baseGravityY', initialGravity)
         
         this.body?.setSize(55, 35)
+		this.setDepth(70)
         
 		this.shineTimer = scene.time.addEvent({
             delay: 500,

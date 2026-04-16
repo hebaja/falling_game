@@ -16,6 +16,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     mainScene: any
     private attackEnableTimer?: Phaser.Time.TimerEvent
 	private isFalling: boolean = true
+	isRising: boolean = false
 
     static preload(scene: Phaser.Scene) {
         scene.load.spritesheet('player_idle', 'Warrior_Idle.png', {
@@ -72,10 +73,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this)
         this.setScale(1.5)
         this.setCollideWorldBounds(true)
-        // this.setGravityY(5000)
         this.setDamping(true)
         this.setDrag(0.01)
-		// this.setDepth(100)
+		this.setDepth(70)
 
         this.body?.setSize(84, 70)
         this.on('animationcomplete-attack', () => {
@@ -110,10 +110,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 	}
 
 	private vibration() {
-		if (this.isFalling) this.y++
-		else this.y--
-		if (this.y == 500) this.isFalling = true
-		if (this.y == 530) this.isFalling = false
+		if (!this.isRising) {
+			if (this.isFalling) this.y++
+			else this.y--
+			if (this.y <= 500) this.isFalling = true
+			if (this.y >= 530) this.isFalling = false
+		}
 	}
 
     update() {
@@ -128,12 +130,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         {
             if (this.controls.left.isDown || this.controls.A.isDown) {
                 this.setFlipX(true)
-                // this.play('run', true)
                 this.setVelocityX(-300)
             }
             else if (this.controls.right.isDown || this.controls.D.isDown) {
                 this.setFlipX(false)
-                // this.play('run', true)
                 this.setVelocityX(300)
             }
             else {
